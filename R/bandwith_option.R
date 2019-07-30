@@ -12,35 +12,23 @@
 #   Install Package:           'Ctrl + Shift + B'
 #   Check Package:             'Ctrl + Shift + E'
 #   Test Package:              'Ctrl + Shift + T'
-
 library(plyr)
-
-hello <- function() {
-  print("Hello, world!")
-}
-
+library(dplyr)
+library(tidyr)
 
 
 data_preparation <- function(dataset, formula, id){
-  if(! is.formula(formula)) stop("You must provide a valid formula")
+  if( !is.formula(formula)) stop("You must provide a valid formula")
 
-  vars <- c(all.vars(formula), id)
+  formula_vars <- all.vars(formula)
+  vars <- c(formula_vars, id)
 
-  if(! all(vars %in%  colnames(dataset))) stop("Your formula cannot match the dataset")
-
-
-  #todo: validate Equation and id fields are in the data set
-  vars <- c("CTNAME86", all.vars(formula))
+  if( ! all(vars %in% colnames(dataset))) stop("Your formula cannot match the dataset")
 
   dataAVG <- dataset %>%
     select(vars) %>%
-    group_by(CTNAME86) %>%
-    summarise(Y_FR = mean(Y_FR), Chomag = mean(Chomag),
-              FaMono = mean(FaMono), FaibSc = mean(FaibSc),
-              ImgRec = mean(ImgRec), P65= mean(P65),
-              Menag1 = mean(Menag1))
-
-
+    group_by(.dots = id) %>%
+    summarise_at(formula_vars, mean)
 }
 
 bandwidthOption <- function(a, b) {
