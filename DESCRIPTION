@@ -13,6 +13,11 @@ Imports:
     plm,
     plyr,
     dplyr,
-    tidyr
+    tidyr,
+    foreach,
+    iterators,
+    parallel,
+    utils,
+    doParallel
 Suggests: 
     testthat

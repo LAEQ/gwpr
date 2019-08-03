@@ -1,4 +1,4 @@
-context("Generate bandwith options")
+context("Data preparation")
 
 library(testthat)
 
@@ -20,9 +20,4 @@ test_that("Data preparation: valid test", {
   load(file = "../../data/data_preparation/expected.rda")
 
   expect_equal(result, expected)
-})
-
-test_that("10 equals 10", {
-  result <- bandwidthOption(4, 4)
-  expect_equal(result, 8)
 })
