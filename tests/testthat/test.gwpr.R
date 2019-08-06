@@ -13,8 +13,17 @@ test_that("Bandwith options: 1", {
   Formula <- gsp ~ pcap + pc + emp + unemp
   bwselection <- c(Bandwidth=90)
 
-  result <- gwpr(USStates, Produc, Formula, c("state", "year"),
-                 bwselection, us_dmat, kernel = "bisquare", effect = "individual", model = "within", adaptive = T)
+  result <- gwpr(  USStates,
+                   Produc,
+                   Formula,
+                   c("state", "year"),
+                   bwselection,
+                   us_dmat,
+                   kernel = "bisquare",
+                   effect = "individual",
+                   model = "within",
+                   adaptive = T
+                 )
   load(file = "../../data/us_data/gwpr/r2_expected.rda")
 
   expect_equal(result[3], r2_expected)
