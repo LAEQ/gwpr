@@ -19,7 +19,12 @@ Depends:
     parallel,
     utils,
     doParallel,
-    GWmodel
+    GWmodel,
+    ggplot2,
+    ggpubr,
+    stringr,
+    rgeos,
+    maptools
 Suggests: 
     testthat (>= 2.1.0)
 RoxygenNote: 6.1.1

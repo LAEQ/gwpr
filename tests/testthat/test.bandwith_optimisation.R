@@ -4,28 +4,28 @@ library(testthat)
 
 source("../../R/bandwith_option.R")
 
-# test_that("Bandwith optimisation: 1", {
-#   Equation <- Y_FR ~ Chomag + FaMono + FaibSc + ImgRec + P65 + Menag1
-#   load(file = "../../data/data_preparation/data_prepared.rda")
-#   load(file = "../../data/bandwith_option/dmat.rda")
-#
-#   sequence_bw <- seq(50, 200, 10)
-#
-#   result <- bandwidth_optimisation(Equation, data_prepared, dmat, sequence_bw)
-#   expect_equal(as.numeric(result), 90)
-# })
-#
-#
-# test_that("Bandwith optimisation: 1", {
-#   Equation <- Y_FR ~ Chomag + FaMono + FaibSc + ImgRec + P65 + Menag1
-#   load(file = "../../data/data_preparation/data_prepared.rda")
-#   load(file = "../../data/bandwith_option/dmat.rda")
-#
-#   sequence_bw <- seq(85, 95, 1)
-#
-#   result <- bandwidth_optimisation(Equation, data_prepared, dmat, sequence_bw)
-#   expect_equal(as.numeric(result), 90)
-# })
+test_that("Bandwith optimisation: 1", {
+  Equation <- Y_FR ~ Chomag + FaMono + FaibSc + ImgRec + P65 + Menag1
+  load(file = "../../data/data_preparation/data_prepared.rda")
+  load(file = "../../data/bandwith_option/dmat.rda")
+
+  sequence_bw <- seq(50, 200, 10)
+
+  result <- bandwidth_optimisation(Equation, data_prepared, dmat, sequence_bw)
+  expect_equal(as.numeric(result), 90)
+})
+
+
+test_that("Bandwith optimisation: 1", {
+  Equation <- Y_FR ~ Chomag + FaMono + FaibSc + ImgRec + P65 + Menag1
+  load(file = "../../data/data_preparation/data_prepared.rda")
+  load(file = "../../data/bandwith_option/dmat.rda")
+
+  sequence_bw <- seq(85, 95, 1)
+
+  result <- bandwidth_optimisation(Equation, data_prepared, dmat, sequence_bw)
+  expect_equal(as.numeric(result), 90)
+})
 
 
 test_that("Bandwith optimisation: Product USA", {

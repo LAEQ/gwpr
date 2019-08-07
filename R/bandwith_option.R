@@ -56,16 +56,16 @@ data_preparation <- function(dataset, formula, id){
 #'
 #' @export
 #'
-bandwidth_optimisation <- function(formula, data, dmat, sequence) {
+bandwidth_optimisation <- function(formula, data, dmat, sequence, kernel = "bisquare", adaptive = TRUE, verbose = FALSE) {
   CVsMat <- matrix(NA, nrow = length(sequence), ncol = 2)
   colnames(CVsMat) <- c("Bandwidth", "CV")
   ResidCV2 <- c()
   adaptive <- TRUE
 
 
-  foreach(bandwidth = sequence, i = icount()) %do% {
+  foreach(bandwidth = sequence, i = icount(), .verbose = verbose) %do% {
     for(j in 1:length(data)){
-      W.j <- gw.weight(as.numeric(dmat[j,]), bw = bandwidth, kernel = "bisquare", adaptive = adaptive)
+      W.j <- gw.weight(as.numeric(dmat[j,]), bw = bandwidth, kernel = kernel, adaptive = adaptive)
       W.j[j] <- 0
       data$wgt <- W.j
       lm.j <- lm(formula = formula, data = data, weights = wgt)
@@ -502,6 +502,7 @@ gwpr <- function(SpDF, dataset, formula, indexes, bandwidth, dmat, kernel, effec
   # @param Qy
   #
   # @return R2
+  # A discuter avec Jeremy
   R2 <- cor(yHat, Qy) ^ 2
   ######################################################
 
@@ -531,7 +532,6 @@ gwpr <- function(SpDF, dataset, formula, indexes, bandwidth, dmat, kernel, effec
     }
   }
   ######################################################
-
   #Rename objects
   colnames(CoefsMat) <- paste(colnames(x), "_Coef", sep = "")
   colnames(SEsMat) <- paste(colnames(x), "_SE", sep = "")
@@ -563,7 +563,7 @@ gwpr <- function(SpDF, dataset, formula, indexes, bandwidth, dmat, kernel, effec
   return(res)
 }
 
-calcul_QX_QY <- function(dataset, formula, index, model, effect){
+compute_QX_QY <- function(dataset, formula, index, model, effect){
   #########################################################################################
   #Panel data preparation
   Pdata <- pdata.frame(dataset, index = index, drop.index = FALSE, row.names = FALSE, stringsAsFactors = default.stringsAsFactors())
@@ -660,9 +660,30 @@ calcul_QX_QY <- function(dataset, formula, index, model, effect){
     QX <- x - xsm - xtm + xmm
   }
 
-  return(data.frame(QX = QX, Qy = Qy))
+  result <- new("QXQY", QX = QX, QY = Qy, n = n, t = t, k = k, x = x, y = y)
+
+  return(result)
 }
-my_gwpr <- function (dmat, bandwith, kernel, adaptive, data_QXY){
+
+######################################################
+# Computation of the GWPR model
+# @param dmat
+# @param bandwith
+# @param kernel
+# @param adaptive
+# @param QX
+# @param QY
+# @param n (total index[1])
+# @param t (total index[2])
+#
+# @return wmat, yHat, Resid, HatMat
+compute_gwpr <- function(qx_qy, dmat, bandwidth, kernel, adaptive){
+  n <- qx_qy@n
+  t <- qx_qy@t
+  k <- qx_qy@k
+  QX <- qx_qy@QX
+  Qy <- qx_qy@QY
+
   ListC     <- list()
   CoefsMat  <- matrix(NA, nrow = n, ncol = k)
   wmat      <- matrix(NA, nrow = n, ncol = n * t)
@@ -687,13 +708,106 @@ my_gwpr <- function (dmat, bandwith, kernel, adaptive, data_QXY){
       yHat[(i - 1) * t + j] <- yHat.temp[(i-1) * t + j]
       Resid[(i - 1) * t + j] <- Qy[(i - 1) * t + j] - yHat[(i - 1) * t + j]
     }
+
     setTxtProgressBar(pb, i)
   }
 
   close(pb)
 
-  # return wmat, Resid,
+  result <- new('GWPR', ListC = ListC, CoefsMat = CoefsMat, wmat = wmat, HatMat = HatMat, yHat = yHat, Resid = Resid)
+
+  return(result)
 }
+
+#' Compute a numeric distance matrix or vector (from GW tools)
+#' @param dataset A numeric matrix of two columns giving the coordinates of the data points
+#' @param p       the power of the Minkowski distance, default is 2, i.e. the Euclidean distance
+#' @param longlat TRUE, great circle distances will be calculated
+#'
+#' @return Returns a numeric distance matrix or vector
+#'
+compute_dmat <- function(dataset, p, longlat){
+  dmat <- gw.dist(dataset, p = p, longlat = longlat)
+
+  return(dmat)
+}
+
+
+######################################################
+# Local R-Squared
+# @param wmat
+# @param Qy
+# @param yHat
+#
+# @return matrix of ....
+compute_localR2Mat <- function(QXQY, GWPR){
+  n <- QXQY@n
+  Qy <- QXQY@QY
+  wmat <- GWPR@wmat
+  yHat <- GWPR@yHat
+
+  LocalR2Mat <- matrix(NA, nrow = n, ncol = 1)
+
+  for (i in 1:n){
+    TSSw.i <- t((Qy) * wmat[i,]) %*% (Qy)
+    RSSw.i <- t((Qy - yHat) * wmat[i,]) %*% (Qy - yHat)
+    LocalR2Mat[i,] <- (TSSw.i - RSSw.i) / TSSw.i
+  }
+
+  return(LocalR2Mat)
+}
+
+
+# Global R-Squared
+# @param yHat
+# @param Qy
+#
+# @return R2
+compute_R2 <- function(QX_QY, GWPR){
+  yHat <- GWPR@yHat
+  Qy <- QX_QY@QY
+
+  return(cor(yHat, Qy) ^ 2)
+}
+
+#' Standard errors and T values (matrices)
+#' @param Resid
+#' @param HatMat
+#'
+#' @return SesMat, TVsMat
+#'
+compute_std_errors_T_values <- function(QX_QY, GWPR){
+  n         <- QX_QY@n
+  t         <- QX_QY@t
+  k         <- QX_QY@k
+  Resid     <- GWPR@Resid
+  HatMat    <- GWPR@HatMat
+  CoefsMat  <- GWPR@CoefsMat
+  ListC     <- GWPR@ListC
+
+  RSS <- t(Resid) %*% (Resid)
+  v1  <- sum(diag(HatMat))
+  v2  <- sum(HatMat ^ 2) # A ete verifie que c'est equivalent a trace(StS)
+
+  # Selon l'equation adaptee au format panel de la GWR (IMPORTANT - is it fixed ?)
+  sigma2 <- as.numeric(RSS / (n * t - 2 * v1 + v2))
+
+  SEsMat <- matrix(nrow = n, ncol = k)
+  TVsMat <- matrix(nrow = n, ncol = k)
+
+  for (i in 1:n){
+    C.i <- ListC[[i]]
+    SEs.i <- c()
+    SEs.i <- sqrt(diag(C.i %*% (t(C.i))) * sigma2)
+    for (j in 1:k){
+      SEsMat[i,j] <- SEs.i[j]
+      TVsMat[i,j] <- CoefsMat[i, j] / SEsMat[i, j]
+    }
+  }
+
+  return(list(SEsMat = SEsMat, TVsMat = TVsMat))
+}
+
 
 #' Return Linear Models for Panel Data
 #'
@@ -707,4 +821,143 @@ my_gwpr <- function (dmat, bandwith, kernel, adaptive, data_QXY){
 gpr <- function(formula, data, effect, model, index){
   PanelModel <- plm(formula = formula, data = data, effect = effect, model = model, index = indexes)
   return(PanelModel)
+}
+
+#' Compute Spacial Polygon Dataframes
+#' @param SpDF        a spacial polygon data frame
+#' @param Shapefile   a customized shape file
+#' @param GWPR        class result from gwpr method
+#' @param QX_QY       class result from QX_QY method
+compute_shapefile <- function(SpDF, result_shapefile, result_gwpr, result_QX_QY){
+  CoefsMat   <- result_gwpr@CoefsMat
+  SEsMat     <- result_shapefile@SEsMat
+  TVsMat     <- result_shapefile@TVsMat
+  LocalR2Mat <- result_shapefile@LocalR2Mat
+  x          <- result_QX_QY@x
+
+  colnames(CoefsMat) <- paste(colnames(x), "_Coef", sep = "")
+  colnames(SEsMat) <- paste(colnames(x), "_SE", sep = "")
+  colnames(TVsMat) <- paste(colnames(x), "_TV", sep = "")
+  colnames(LocalR2Mat) <- c("Local_RSquared")
+
+
+  listMat <- list(LocalR2Mat, CoefsMat, SEsMat, TVsMat)
+  for(i in 1:length(listMat)){
+    newVars <- colnames(listMat[[i]])
+
+    for(j in 1:length(newVars)){
+      SpDF$x <- listMat[[i]][, j]
+      last <- length(names(SpDF))
+      names(SpDF)[last] <- newVars[j]
+    }
+  }
+
+  res <- list(listMat, SpDF, result_shapefile@R2)
+
+  return(res)
+}
+
+compute_gpwr_plot <- function(Dataset, P=c("0.05","0.01","0.001")){
+  # T values
+  P <- match.arg(P)
+  n <- nrow(Dataset)
+  if(P=="0.05") {TValue = qt(1-(0.05/2), n-2)}
+  if(P=="0.01") {TValue = qt(1-(0.05/2), n-2)}
+  if(P=="0.001"){TValue = qt(1-(0.05/2), n-2)}
+  TVLimits <- c(qt(1 - (0.05 / 2), n - 2), qt( 1 - (0.01 / 2), n - 2),qt( 1 - (0.001 / 2), n - 2))
+
+  #Data preparation
+  Dataset$OID <- 1:nrow(Dataset)
+  Dataset$LocalR2 <- Dataset$Local_RSquared
+
+  # Note: Fortify is deprecated (https://www.rdocumentation.org/packages/ggplot2/versions/3.2.0/topics/fortify)
+  FDataset <- fortify(Dataset, region='OID')
+  FDataset <- merge(FDataset, Dataset, by.x = "id", by.y = "OID", all.x = TRUE)
+
+  Vars      <- names(Dataset)
+  TNames    <- Vars[str_detect(Vars, regex("TV"))]
+  CoefNames <- Vars[str_detect(Vars, regex("Coef"))]
+
+  R2Plot <- ggplot(data = FDataset, mapping = aes(x = long, y = lat, group = group)) +
+            geom_polygon(aes(fill = LocalR2), colour = "black") +
+            scale_fill_gradient(high = "black", low = "white") +
+            labs(x = NULL, y = NULL, title = "Geographically Weighted Regression", subtitle = "R squared")+
+            theme_void() +
+            coord_equal()
+
+
+  #Mapping coefficients
+  CoeffPlots <- list()
+  for (Name in CoefNames){
+    NameT <- str_replace(Name, "_Coef", "_TV")
+    FDataset$Binary <- ifelse(abs(FDataset[[NameT]])>=TValue, "1", "0")
+    FDatasetB <- subset(FDataset,FDataset$Binary=="0")
+
+    Plot <- ggplot(data = FDataset, mapping= aes(x=long,y=lat,group=group)) +
+      geom_polygon(aes_string(fill=Name), colour="black")+
+      scale_fill_gradient(high="#99000d",low="#fff5f0")+
+      geom_polygon(data = FDatasetB, mapping= aes(x=long,y=lat,group=group), fill="gray",colour="black")+
+      xlab(Name)+ylab("")+
+      labs(caption = paste("Gray: not significant at P=",P, sep=""))+
+      theme_void()+
+      coord_equal()
+    CoeffPlots[[length(CoeffPlots)+1]] <- Plot
+  }
+
+  #Mapping Significance
+  TPlots <- list()
+  cols <- c( "Negative: P<0.001" = "#2166AC",
+             "Negative: P=[0.001-0.01[" = "#67A9CF",
+             "Negative: P=[0.01-0.05[" = "#D1E5F0",
+             "Not significant" = "#E6E6E6",
+             "Positive: P=[0.01-0.05[" = "#FDDBC7",
+             "Positive: P=[0.001-0.01[" = "#EF8A62",
+             "Positive: P<0.001" = "#B2182B")
+  for (Name in TNames){
+    FDataset[[paste(Name,"SignLevel",sep="_")]]  <-
+      cut(FDataset[[paste(Name,sep="_")]],
+          breaks = c(-Inf, -TVLimits[3], -TVLimits[2], -TVLimits[1], TVLimits[1], TVLimits[2], TVLimits[3], Inf),
+          labels = c("Negative: P<0.001", "Negative: P=[0.001-0.01[","Negative: P=[0.01-0.05[", "Not significant","Positive: P=[0.01-0.05[","Positive: P=[0.001-0.01[", "Positive: P<0.001"))
+    Plot <- ggplot(data = FDataset, mapping= aes(x=long,y=lat,group=group)) +
+      geom_polygon(aes_string(fill=paste(Name,"SignLevel",sep="_")), colour="black")+
+      scale_fill_manual(values = cols)+
+      xlab("TITI")+ylab("")+
+      theme(axis.ticks.x=element_blank(),
+            axis.ticks.y=element_blank()
+      )+
+      theme_void()+
+      coord_equal()
+    TPlots[[length(TPlots)+1]] <- Plot
+  }
+
+  #Mapping the most local significant variable
+  AbsTNames  <- c()
+  for(Name in TNames){
+    FDataset[[paste("Abs",Name,sep="_")]] <- abs(FDataset[[Name]])
+    AbsTNames[[length(AbsTNames)+1]] <- paste("Abs",Name,sep="_")
+  }
+  FDataset$MostSignif <- as.factor(AbsTNames[apply(FDataset[AbsTNames],1,which.max)])
+  PlotMostSignif <- ggplot(data = FDataset, mapping= aes(x=long,y=lat,group=group)) +
+    geom_polygon(aes(fill=MostSignif), colour="black")+
+    xlab("")+ylab("")+
+    labs(x = NULL, y = NULL,
+         title = "Geographically Weighted Regression",
+         subtitle = paste("The most significant variable at the level of P =",P, sep=" "))+
+    theme_void()+
+    coord_equal()
+
+  #Etape 6 : cartographier le nombre de variable significative
+  FDataset$NSignif <- rowSums((FDataset[,TNames] > TValue | FDataset[,TNames] < -TValue ))
+  FDataset$NSignif <- as.character(FDataset$NSignif)
+  PlotNSignif <- ggplot(data = FDataset, mapping= aes(x=long,y=lat,group=group)) +
+    geom_polygon(aes(fill=NSignif), colour="black")+
+    #scale_fill_manual(values = Colors)+
+    scale_fill_brewer(type = "seq", palette = "OrRd", direction = 1)+
+    labs(x = NULL, y = NULL,
+         title = "Geographically Weighted Regression",
+         subtitle = paste("Number of significant variables at the level of P =",P, sep=" "))+
+    theme_void()+
+    coord_equal()
+
+  return (list(R2Plot,CoeffPlots,TPlots,PlotMostSignif,PlotNSignif))
 }
