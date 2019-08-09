@@ -19,7 +19,9 @@ test_that("Data preparation: valid test", {
   load(file = "../../data/us_data/Data.Rdata")
 
   result <- data_preparation(Produc, Equation, "state")
-  load(file = "../../data/us_data/data_preparation/produc_result.rda")
 
-  expect_equal(result, expected)
+  load(file="../../data/us_data/dataAVG_expected.rda")
+
+  # https://github.com/tidyverse/dplyr/issues/2751
+  expect_equal(as.data.frame(result[,-1]), as.data.frame(dataAVG_expected))
 })

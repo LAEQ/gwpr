@@ -1,0 +1,17 @@
+context("Compute LocalR2Mat")
+
+library(testthat)
+
+source("../../R/bandwith_option.R")
+
+test_that("Computation of LocalR2Matrice", {
+  load(file = "../../data/us_data/qx_qy_expected.rda")
+  load(file = "../../data/us_data/gwpr_expected.rda")
+  load(file = "../../data/us_data/LocalR2Mat_expected.rda")
+
+  qx_qy <- new("QXQY", QX = QX, QY = Qy, n = n, t = t, k = k, x = x, y = y)
+  gwpr  <- new('GWPR', ListC = ListC, CoefsMat = CoefsMat, wmat = wmat, HatMat = HatMat, yHat = yHat, Resid = Resid)
+  result <- compute_localR2Mat(qx_qy, gwpr)
+
+  expect_equal(result, LocalR2Mat)
+})
