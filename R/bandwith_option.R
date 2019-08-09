@@ -65,7 +65,7 @@ data_preparation <- function(dataset, formula, id){
 #'
 bandwidth_optimisation <- function(formula, data, dmat, sequence, kernel = "bisquare", adaptive = TRUE) {
   if(nrow(data) != nrow(dmat)){
-    stop(sprf("Number of rows between data and dmat don't match: data(%d) - dmat(%d)", nrow(data), nrow(dmat)))
+    stop(sprintf("Number of rows between data and dmat don't match: data(%d) - dmat(%d)", nrow(data), nrow(dmat)))
   }
 
   CVsMat <- matrix(NA, nrow = length(sequence), ncol = 2)
@@ -109,7 +109,7 @@ bandwidth_optimisation <- function(formula, data, dmat, sequence, kernel = "bisq
 #' @param kernel    function chosen as follow: gaussian, exponential, bisquare, tricube, boxcar
 #'
 #' @export
-gwpr <- function(SpDF, dataset, formula, indexes, bandwidth, dmat, kernel, effect, model, adaptive = F){
+gwpr <- function(SpDF, dataset, formula, indexes, bandwidth, dmat, kernel, effect, model, adaptive = TRUE){
   if( ! all(indexes %in% colnames(dataset))) stop("Indexes are missing in the dataframe")
   if( ! all(all.vars(formula) %in% colnames(dataset))) stop("Your formula does not match the dataset")
   if( ! effect %in% c("individual", "twoways", "time")) stop(paste(effect, " is not supported. (invidual, twoways, time)"))
@@ -332,6 +332,53 @@ gwpr <- function(SpDF, dataset, formula, indexes, bandwidth, dmat, kernel, effec
   res <- list(listMat, SpDF, R2)
 
   return(res)
+}
+
+#' Desc to come
+#'
+#' @param SpatialDataFrame  (desc to come)
+#' @param dataset           (desc to come)
+#' @param formula           (desc to come)
+#' @param id                (desc to come)
+#' @param index             (desc to come)
+#' @param sequence          (desc to come)
+#' @param kernel            (desc to come)
+#' @param effect            (desc to come)
+#' @param model             (desc to come)
+#' @param adaptive          (desc to come)
+#'
+#' @return                  (desc to come)
+#'
+#' @export
+#'
+gwlpr <- function(SpatialDataFrame, dataset, formula, id, index, sequence, kernel = "bisquare", effect = "individual", model = "within", adaptive = TRUE){
+  # 1. Compute the distance matrix
+  distance_matrix <- compute_dmat(coordinates(SpatialDataFrame), p = 2, longlat = F)
+
+  # 2. Compute averages
+  dataAVG <- data_preparation(dataset, formula, id)
+
+  # 2. Find the optimal bandwith
+  bandwidth <- bandwidth_optimisation(formula, dataAVG, distance_matrix, sequence, kernel, adaptive)
+
+  # 3. Calculate QX and QY
+  result_QX_QY <- compute_QX_QY(dataset, formula, index, model, effect)
+
+  # 4. Compute the geographical weight panel regression
+  result_gwpr <- compute_gwpr(result_QX_QY, distance_matrix, bandwidth[[1]], kernel, adaptive)
+
+  # 5. Create and return a shape file
+  result_shapefile            <- new('ShapeFile')
+  result_shapefile@LocalR2Mat <- compute_localR2Mat(result_QX_QY, result_gwpr)
+  result_shapefile@R2         <- compute_R2(result_QX_QY, result_gwpr)
+  result_SEs_TVs              <- compute_std_errors_T_values(result_QX_QY, result_gwpr)
+
+  result_shapefile@SEsMat <- result_SEs_TVs$SEsMat
+  result_shapefile@TVsMat <- result_SEs_TVs$TVsMat
+
+  shape_file <- compute_shapefile(SpatialDataFrame, result_shapefile, result_gwpr, result_QX_QY)
+
+  return(shape_file)
 }
 
 
@@ -625,12 +672,12 @@ compute_shapefile <- function(SpDF, result_shapefile, result_gwpr, result_QX_QY)
   colnames(LocalR2Mat) <- c("Local_RSquared")
 
 
-  listMat <- list(LocalR2Mat, CoefsMat, SEsMat, TVsMat)
+   listMat <- list(LocalR2Mat, CoefsMat, SEsMat, TVsMat)
+
   for(i in 1:length(listMat)){
     newVars <- colnames(listMat[[i]])
-
     for(j in 1:length(newVars)){
-      SpDF$x <- listMat[[i]][, j]
+      SpDF$x <- listMat[[i]][,j]
       last <- length(names(SpDF))
       names(SpDF)[last] <- newVars[j]
     }

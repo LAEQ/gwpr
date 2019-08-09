@@ -1,4 +1,4 @@
-context("Compute LocalR2Mat")
+context("Compute R2")
 
 library(testthat)
 

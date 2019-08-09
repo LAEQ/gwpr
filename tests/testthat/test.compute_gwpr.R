@@ -9,7 +9,7 @@ test_that("compute_gwpr", {
   load(file = "../../data/us_data/qx_qy_expected.rda")
   load(file = "../../data/us_data/dmat_expected.rda")
   load(file = "../../data/us_data/bandwidth_expected.rda")
-  load(file = "../../data/us_data/gwpr_expected_2.rda")
+  load(file = "../../data/us_data/gwpr_expected.rda")
 
   equation <- gsp ~ pcap + pc + emp + unemp
   index <- c("state", "year")

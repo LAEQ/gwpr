@@ -12,7 +12,7 @@
 # library(stargazer)
 # library(plyr)
 #
-# # source("R/bandwith_option.R")
+# source("R/bandwith_option.R")
 #
 #
 # # US
@@ -111,8 +111,6 @@
 # }
 # close(pb)
 #
-#
-#
 # LocalR2Mat <- matrix(NA, nrow = n, ncol = 1)
 # for (i in 1:n){
 #   TSSw.i <- t((Qy)*wmat[i,])%*%(Qy)
@@ -130,6 +128,8 @@
 # SEsMat <- matrix(nrow = n, ncol = k)
 # TVsMat <- matrix(nrow = n, ncol = k)
 #
+#
+#
 # for (i in 1:n){
 #   C.i <- ListC[[i]]
 #   SEs.i <- c()
@@ -140,7 +140,7 @@
 #   }
 # }
 #
-# save(ListC, CoefsMat, wmat, HatMat, yHat, Resid, file="data/us_data/gwpr_expected_2.rda")
+#
 #
 # #Rename objects
 # colnames(CoefsMat) <- paste(colnames(x), "_Coef", sep = "")
@@ -160,36 +160,38 @@
 # }
 #
 #
-#
-# # save(BwOpt, Opt, file="data/us_data/bandwidth_expected.rda")
-# # save(dataAVG_expected, file = "data/us_data/dataAVG_expected.rda")
-# # my_dataAVG <- data_preparation(dataset = Produc, formula = formula, id = "state")
-#
-#
-# # bwselection <- bwopt_cv(data=Produc, index=c("state", "year"), formula=Equation, kernel="bisquare",
-# #                         adaptive=T, dmat=dmat, lowerBW=1, upperBW=48, step=1)
+# #
+# # #
+# #
+# # # save(BwOpt, Opt, file="data/us_data/bandwidth_expected.rda")
+# # # save(dataAVG_expected, file = "data/us_data/dataAVG_expected.rda")
+# # # my_dataAVG <- data_preparation(dataset = Produc, formula = formula, id = "state")
 # #
 # #
-# # my_avg = data_preparation(Produc, Equation, "state")
-# # my_bw <- bandwidth_optimisation(formula, my_dataAVG, dmat, seq(1, 48, 1))/
+# # # bwselection <- bwopt_cv(data=Produc, index=c("state", "year"), formula=Equation, kernel="bisquare",
+# # #                         adaptive=T, dmat=dmat, lowerBW=1, upperBW=48, step=1)
+# # #
+# # #
+# # # my_avg = data_preparation(Produc, Equation, "state")
+# # # my_bw <- bandwidth_optimisation(formula, my_dataAVG, dmat, seq(1, 48, 1))/
+# # #
+# # #
+# # # save(my_avg, file="my_avg.rda")
+# # #
+# # #
+# # # bwselection == my_bw
 # #
 # #
-# # save(my_avg, file="my_avg.rda")
 # #
 # #
-# # bwselection == my_bw
-#
-#
-#
-#
-# # Mtl
-# # load("data/mtl_data/PanelMtl.rda")
-# # load("data/mtl_data/dmat.rda")
-# # Equation <- Y_FR ~ Chomag + FaMono + FaibSc + ImgRec + P65 + Menag1
+# # # Mtl
+# # # load("data/mtl_data/PanelMtl.rda")
+# # # load("data/mtl_data/dmat.rda")
+# # # Equation <- Y_FR ~ Chomag + FaMono + FaibSc + ImgRec + P65 + Menag1
+# # #
+# # # bwselection <- bwopt_cv(data=PanelMtl, index=c("CTNAME86", "AN"), formula=Equation, kernel="bisquare",
+# # #                         adaptive=T, dmat=dmat,  lowerBW=50, upperBW=200, step=10)
+# # #
+# # # my_avg = data_preparation(PanelMtl, Equation, "CTNAME86")
+# # # my_bw <- bandwidth_optimisation(Equation, my_avg, dmat, seq(50, 200, 10))
 # #
-# # bwselection <- bwopt_cv(data=PanelMtl, index=c("CTNAME86", "AN"), formula=Equation, kernel="bisquare",
-# #                         adaptive=T, dmat=dmat,  lowerBW=50, upperBW=200, step=10)
-# #
-# # my_avg = data_preparation(PanelMtl, Equation, "CTNAME86")
-# # my_bw <- bandwidth_optimisation(Equation, my_avg, dmat, seq(50, 200, 10))
-#
