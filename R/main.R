@@ -3,8 +3,6 @@
 # load(file = "data/us_data/Data.Rdata")
 # load(file = "data/us_data/us_dmat.rda")
 #
-#
-# USStates@data$id <- c(1:length(unique(USStates@data[,"state"])))
 # equation <- gsp ~ pcap + pc + emp + unemp
 # sequence <- seq(1, 48, 1)
 # index <- c("state", "year")
@@ -16,11 +14,12 @@
 #
 #
 # dmat <- compute_dmat(coordinates(USStates), p = 2, longlat = F)
-# bandwidth <- bandwidth_optimisation(equation, Produc, dmat, sequence, kernel = "bisquare", adaptive = TRUE, verbose = FALSE)
+# data_avg <- data_preparation(Produc, equation, "state")
+# bandwidth <- bandwidth_optimisation(equation, data_avg , dmat, sequence, kernel = "bisquare", adaptive = TRUE)
 #
 #
 # result_QX_QY <- compute_QX_QY(Produc, equation, index, model, effect)
-# result_gwpr <- compute_gwpr(result_QX_QY, dmat, bandwidth, kernel, adaptive)
+# result_gwpr <- compute_gwpr(result_QX_QY, dmat, bandwidth[[1]], kernel, adaptive)
 #
 #
 # result_shapefile <- new('ShapeFile')

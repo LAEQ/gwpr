@@ -17,6 +17,9 @@ gpr(formula, data, effect, model, index)
 
 \item{index}{list of indexes}
 }
+\value{
+to define
+}
 \description{
 Return Linear Models for Panel Data
 }

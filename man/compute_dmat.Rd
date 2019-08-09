@@ -4,7 +4,7 @@
 \alias{compute_dmat}
 \title{Compute a numeric distance matrix or vector (from GW tools)}
 \usage{
-compute_dmat(dataset, p, longlat)
+compute_dmat(dataset, p = 2, longlat = TRUE)
 }
 \arguments{
 \item{dataset}{A numeric matrix of two columns giving the coordinates of the data points}
@@ -14,7 +14,7 @@ compute_dmat(dataset, p, longlat)
 \item{longlat}{TRUE, great circle distances will be calculated}
 }
 \value{
-Returns    A numeric distance matrix or vector
+A numeric distance matrix or vector
 }
 \description{
 Compute a numeric distance matrix or vector (from GW tools)

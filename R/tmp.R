@@ -159,7 +159,12 @@
 #   }
 # }
 #
+# source("R/PlotGWPR.R")
 #
+# Plots <- PlotGWPR(USStates, P="0.05")
+#
+#
+# ggarrange(plotlist = list(Plots[[2]][[1]], Plots[[2]][[2]], Plots[[2]][[3]], Plots[[2]][[4]]), ncol = 2, nrow = 2)
 # #
 # # #
 # #

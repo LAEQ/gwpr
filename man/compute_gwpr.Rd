@@ -24,7 +24,7 @@ compute_gwpr(qx_qy, dmat, bandwidth, kernel, adaptive)
 \item{t}{(total index[2])}
 }
 \value{
-wmat, yHat, Resid, HatMat
+wmat, yHat, Resid, HatMat (description ....)
 }
 \description{
 Computation of the GWPR model
