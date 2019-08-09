@@ -1,14 +1,18 @@
 Package: laeq
-Type: Package
-Title: What the Package Does (Title Case)
+Title: What the Package Does to define
 Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
+Date: 2019-08-31
+URL: https://github.com/LAEQ/gwpr
+Author: Maxime Gaboriault-Boudreau <email@toprovide.com> with contributions from ....
+Maintainer: David Maignan <davidmaignan@gmail.com>
 Description: More about what it does (maybe more than one line)
     Use four spaces when indenting paragraphs within the Description.
-License: What license is it under?
+    This reseach project was funded by the LAEQ (http://laeq.ucs.inrs.ca/) and supervised by Philippe Apparicio <philippe.apparicio@ucs.inrs.ca>
+License: file LICENCE
 Encoding: UTF-8
 LazyData: true
+Depends:
+    R (>= 3.6.1)
 Imports:
     plm,
     plyr,
@@ -18,6 +22,13 @@ Imports:
     iterators,
     parallel,
     utils,
-    doParallel
+    doParallel,
+    GWmodel,
+    ggplot2,
+    ggpubr,
+    stringr,
+    rgeos,
+    maptools
 Suggests: 
-    testthat
+    testthat (>= 2.1.0)
+RoxygenNote: 6.1.1
