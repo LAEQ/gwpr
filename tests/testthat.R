@@ -1,4 +1,4 @@
 library(testthat)
-library(laeq)
+library(gwpr)
 
-test_check("laeq")
+test_check("gwpr")

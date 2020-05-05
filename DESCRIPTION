@@ -1,34 +1,22 @@
-Package: laeq
-Title: What the Package Does to define
-Version: 0.1.0
-Date: 2019-08-31
-URL: https://github.com/LAEQ/gwpr
-Author: Maxime Gaboriault-Boudreau <email@toprovide.com> with contributions from ....
-Maintainer: David Maignan <davidmaignan@gmail.com>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
-    This reseach project was funded by the LAEQ (http://laeq.ucs.inrs.ca/) and supervised by Philippe Apparicio <philippe.apparicio@ucs.inrs.ca>
-License: file LICENCE
+Package: gwpr
+Title: What the Package Does (One Line, Title Case)
+Version: 0.0.0.9000
+Authors@R: c(
+  person("Maxime", "Gaboriault", email = "gaboriaultmaxime95@gmail.com", role = c("cre", "aut")),
+  person("Philippe", "Apparicio", email = "philippe.apparicio@ucs.inrs.ca", role = c("aut")),
+  person("David", "Maignan", email = "davidmaignan@gmail.com", role = "com"))
+Description: License: GNU General Public License v3 (GPL-3).
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
-Depends:
-    R (>= 3.6.1)
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.0
+Depends: R (>= 3.6.3)
 Imports:
     plm,
     plyr,
     dplyr,
-    tidyr,
-    foreach,
-    iterators,
-    parallel,
-    utils,
-    doParallel,
     GWmodel,
-    ggplot2,
-    ggpubr,
-    stringr,
-    rgeos,
-    maptools
+    lmtest
 Suggests: 
-    testthat (>= 2.1.0)
-RoxygenNote: 6.1.1
+    testthat
