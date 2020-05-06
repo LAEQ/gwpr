@@ -3,7 +3,7 @@
 library(testthat)
 
 test_that("Bandwith option: Version avec donnees moyennes / adaptive bw ", {
-  load(file = '../../data/Data.Rdata')
+  load(file = '../../inst/Data.Rdata')
   USStates@data$id <- c(1:length(unique(USStates@data[,"state"])))
   data <- merge(USStates@data, Produc, by="state", all=T)
 
