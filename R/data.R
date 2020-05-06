@@ -25,3 +25,4 @@
 #'
 #' @format A spatialPolygonDataFrame
 #'
+"USStates"
