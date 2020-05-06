@@ -14,5 +14,6 @@ Open a R console or R Studio
 install.packages("devtools")
 library(devtools)
 devtools.install_github("LAEQ/gwpr")
+# detach("package:gwpr", unload = TRUE)
 ??gwpr
 ```
