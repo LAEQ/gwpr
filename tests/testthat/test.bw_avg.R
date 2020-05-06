@@ -3,7 +3,12 @@
 library(testthat)
 
 test_that("Bandwith option: Version avec donnees moyennes / adaptive bw ", {
-
-  expect_equal(1, 1)
+  wd <- getwd()
+  path <- file.path(getwd(), "..","..", "data", "Data.rda")
+  if(file.exists(path)){
+    expect_equal(1, 1)
+  } else {
+    expect_equal(1, 0)
+  }
 })
 
