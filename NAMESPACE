@@ -3,3 +3,4 @@
 export(bw.CV.A)
 export(bw.CV.F)
 export(bw.avg)
+export(gwplm)
