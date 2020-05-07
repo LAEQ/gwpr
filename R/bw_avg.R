@@ -78,9 +78,9 @@ bw.CV.A <- function(formula, data, index, effect=c("individual", "time", "twoway
   # "Long data, calculations may take a long time, optimisation on time-averaged data suggested
   # by choosing 'short = TRUE'." et auquel cas moyenner les donnees et les passer dans bw.avg
 
-  #Optimization Process
-  cat("\nOptimization Process:", length(bws), "iterations \n")
-  pb <- txtProgressBar(min = 0, max = length(bws), style = 3)
+  # Optimization Process
+  # cat("\nOptimization Process:", length(bws), "iterations \n")
+  # pb <- txtProgressBar(min = 0, max = length(bws), style = 3)
 
   for(i in 1:length(bws)){
     bw <- bws[i]
@@ -103,14 +103,14 @@ bw.CV.A <- function(formula, data, index, effect=c("individual", "time", "twoway
     CVsMat[i,2] <- t(resid)%*%(resid)
     Pdata$wgt <- NULL
     resid <- NULL
-    setTxtProgressBar(pb, i)
+    # setTxtProgressBar(pb, i)
   }
-  close(pb)
+  # close(pb)
 
   bw <- subset(CVsMat, CVsMat[,2]==min(CVsMat[,2], na.rm=TRUE))
-  print(as.data.frame(CVsMat))
-  cat("Optimal value for the bandwidth (number of neighbors): ", bw[,'Bandwidth'], sep="")
-  cat("\nwith a CV score value: ", bw[,'CV-score'], sep="")
+  # print(as.data.frame(CVsMat))
+  # cat("Optimal value for the bandwidth (number of neighbors): ", bw[,'Bandwidth'], sep="")
+  # cat("\nwith a CV score value: ", bw[,'CV-score'], sep="")
 
   return(bw[,'Bandwidth'])
 }
