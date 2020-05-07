@@ -16,10 +16,7 @@ test_that("Bandwith option: Version avec pseudo-CV / adaptive bw", {
   bwCV.A <-  bw.CV.A(formula=Equation, data=data, index=c("id","year"),
                      effect='individual', model="within", kernel="bisquare",
                      dMat=dMat, bws=c(30:40))
-  # expected <- c(34.0)
-  # names(expected) <- c("bandwidth")
-  # expect_setequal(bwCV.A, expected)
-  expect_equal(1, 1)
+  expect_equal(bwCV.A[['Bandwidth']], 34)
 })
 #
 # test_that("Bandwith option: Version avec pseudo-CV / fixed bw", {
