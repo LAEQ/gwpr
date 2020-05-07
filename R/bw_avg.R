@@ -20,7 +20,7 @@
 bw.avg <- function(formula, data, SDF, index, approach=c("CV","AICc"), kernel="bisquare", adaptive=FALSE, p=2, longlat=FALSE, dMat){
   #Extraction of parameters to be used
   pdata       <- plm::pdata.frame(data, index = index, drop.index = FALSE, row.names = FALSE, stringsAsFactors = default.stringsAsFactors())
-  panelModel  <- plm(formula = formula, model="pooling", data=pdata, index=index)
+  panelModel  <- plm::plm(formula = formula, model="pooling", data=pdata, index=index)
   n           <- length(unique(pdata[,index[1]]))
   t           <- length(unique(pdata[,index[2]]))
   K           <- length(all.vars(formula)[-1])
