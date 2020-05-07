@@ -105,7 +105,7 @@ bw.CV.A <- function(formula, data, index, effect=c("individual", "time", "twoway
     resid <- NULL
     # setTxtProgressBar(pb, i)
   }
-  # close(pb)
+  #close(pb)
 
   bw <- subset(CVsMat, CVsMat[,2]==min(CVsMat[,2], na.rm=TRUE))
   # print(as.data.frame(CVsMat))
