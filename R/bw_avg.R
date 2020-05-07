@@ -114,3 +114,60 @@ bw.CV.A <- function(formula, data, index, effect=c("individual", "time", "twoway
 
   return(bw[,'Bandwidth'])
 }
+
+#' A function for bandwith selection to calibrate a GWPR model, based on the mean over time of the data.
+#'
+#' @param formula       Regression model formula : Y ~ X1 + ... + Xk
+#' @param data          dataFrame for the Panel data
+#' @param index         List for the indexes : (c(" ID, Time"))
+#' @param effect        the effects introduced in the model, one of "individual", "time", or "twoways" (see plm::plm)
+#' @param model         one of "pooling", "within", "between", "random", "fd", or "ht" (see plm::plm)
+#' @param kernel        gaussian,exponential, bisquare, tricube, boxcar (see GWmodel::gw.weight)
+#' @param dMat          a distance matrix or vector (Optional parameter, see GWmodel::gw.weight)
+#' @param interval      vector of lowest and highest distances to be used in the bw optimization process
+#'
+#' @return double
+#'
+#' @export
+bw.CV.F <- function(formula, data, index, effect=c("individual", "time", "twoways", "nested"),
+                    model=c("within", "random", "ht", "between", "pooling", "fd"),
+                    kernel="bisquare", dMat, interval){
+
+  #Data preparation
+  Pdata <- plm::pdata.frame(data, index = index, drop.index = FALSE, row.names = FALSE, stringsAsFactors = default.stringsAsFactors())
+  n <- length(unique(Pdata[,index[1]]))
+  t <- length(unique(Pdata[,index[2]]))
+  resid <- c()
+
+  # Faire ici le critere de mesure du data pour, si n*t > C, ou si les bornes sont trop eloignees, impression d'un
+  # message tel quel "Long data, calculations may take a long time, optimisation on time-averaged data suggested
+  # by choosing 'short = TRUE'." et auquel cas moyenner les donnees et les passer dans bw.avg
+
+  #Optimization Process
+  CV <- function(bw, n, kernel, adaptive){
+
+    for(j in 1:n){
+      W.j <- GWmodel::gw.weight(as.numeric(dMat[j,]), bw=bw, kernel=kernel, adaptive=adaptive)
+      W.j[j] <- 0
+      W.j <- diag(W.j)
+      W.j <- kronecker(W.j,diag(t))
+      W.j <- diag(W.j)
+      Pdata$wgt <- W.j
+      plm.j <- plm::plm(formula=formula, model=model, data=Pdata, index=index, weights = wgt)
+
+      for(l in 1:t){
+        resid[(j-1)*t+l] <- plm::pmodel.response(plm.j)[(j-1)*t+l] - predict(plm.j)[(j-1)*t+l]
+      }
+    }
+    CVscore <- t(resid)%*%(resid)
+    return(CVscore)
+  }
+
+  bw.cv <- optimize(CV, interval=interval, n=n, kernel=kernel, adaptive=F, maximum=F)
+  bw <- as.numeric(bw.cv)
+  names(bw) <- c('Bandwidth', 'CV-score')
+  cat("Optimal value for the bandwidth (distance): ", bw[['Bandwidth']], sep="")
+  cat("\nwith a CV score value: ", bw[['CV-score']], sep="")
+
+  return(bw[['Bandwidth']])
+}
