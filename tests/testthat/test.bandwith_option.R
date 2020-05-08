@@ -34,5 +34,5 @@ test_that("Bandwith option: Version avec pseudo-CV / fixed bw", {
                      effect='individual', model="within",
                      kernel="bisquare", dMat=dMat, interval=c(1500000, 2500000))
 
-  expect_equal(bwCV.F, 2038054.18356155)
+  expect_equal(bwCV.F, 2038054.18356155, tolerance=1e-3)
 })
