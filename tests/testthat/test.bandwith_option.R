@@ -3,20 +3,20 @@
 library(testthat)
 
 test_that("Bandwith option: Version avec pseudo-CV / adaptive bw", {
-  # Produc <- readRDS(system.file("Produc.rds", package = "gwpr"))
-  # USStates <- readRDS(system.file("USStates.rds", package = "gwpr"))
-  #
-  # USStates@data$id <- c(1:length(unique(USStates@data[,"state"])))
-  # data <- merge(USStates@data, Produc, by="state", all=T)
-  #
-  # dMat <- GWmodel::gw.dist(sp::coordinates(USStates), p=2, longlat=F)
-  # Equation <- log(gsp) ~ log(pcap) + log(pc) + log(emp) + unemp
-  #
-  # ## adaptive bw
-  # bwCV.A <-  bw.CV.A(formula=Equation, data=data, index=c("id","year"),
-  #                    effect='individual', model="within", kernel="bisquare",
-  #                    dMat=dMat, bws=c(30:40))
-  # expect_equal(bwCV.A[['Bandwidth']], 34)
+  Produc <- readRDS(system.file("Produc.rds", package = "gwpr"))
+  USStates <- readRDS(system.file("USStates.rds", package = "gwpr"))
+
+  USStates@data$id <- c(1:length(unique(USStates@data[,"state"])))
+  data <- merge(USStates@data, Produc, by="state", all=T)
+
+  dMat <- GWmodel::gw.dist(sp::coordinates(USStates), p=2, longlat=F)
+  Equation <- log(gsp) ~ log(pcap) + log(pc) + log(emp) + unemp
+
+  ## adaptive bw
+  bwCV.A <-  bw.CV.A(formula=Equation, data=data, index=c("id","year"),
+                     effect='individual', model="within", kernel="bisquare",
+                     dMat=dMat, bws=c(30:40))
+  expect_equal(bwCV.A[['Bandwidth']], 34)
 
   expect_true(TRUE)
 })
