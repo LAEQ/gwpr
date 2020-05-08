@@ -25,25 +25,27 @@ test_that("Bandwith option:Version avec donnees moyennes / adaptive bw ", {
 
   expect_equal(result,  USgwplm.A)
 })
-#
-#
-# test_that("Bandwith option:Version avec donnees moyennes / adaptive bw ", {
-#   load(file = '../../data/Data.Rdata')
-#   USStates@data$id <- c(1:length(unique(USStates@data[,"state"])))
-#   data <- merge(USStates@data, Produc, by="state", all=T)
-#
-#   dMat <- GWmodel::gw.dist(sp::coordinates(USStates), p=2, longlat=F)
-#   Equation <- log(gsp) ~ log(pcap) + log(pc) + log(emp) + unemp
-#
-#   load(file = '../data/bwCV.F.Rdata')
-#
-#   result <- gwplm(SpDF=USStates, data=data, index=c("id", "year"),
-#                      formula=Equation, bw=bwCV.F, kernel="bisquare",
-#                      adaptive=F, effect="individual", model="within",
-#                      dMat=dMat)
-#
-#
-#   load(file = '../data/USgwplm.B.RData')
-#
-#   expect_equal(result, USgwplm.B)
-# })
+
+
+test_that("Bandwith option:Version avec donnees moyennes / adaptive bw ", {
+  Produc <- readRDS(system.file("Produc.rds", package = "gwpr"))
+  USStates <- readRDS(system.file("USStates.rds", package = "gwpr"))
+
+  USStates@data$id <- c(1:length(unique(USStates@data[,"state"])))
+  data <- merge(USStates@data, Produc, by="state", all=T)
+
+  dMat <- GWmodel::gw.dist(sp::coordinates(USStates), p=2, longlat=F)
+  Equation <- log(gsp) ~ log(pcap) + log(pc) + log(emp) + unemp
+
+  bwCV.F <- readRDS(system.file("bwCV.F.rds", package = "gwpr"))
+
+  result <- gwplm(SpDF=USStates, data=data, index=c("id", "year"),
+                     formula=Equation, bw=bwCV.F, kernel="bisquare",
+                     adaptive=F, effect="individual", model="within",
+                     dMat=dMat)
+
+
+  USgwplm.B <- readRDS(system.file("USgwplm.B.rds", package = "gwpr"))
+
+  expect_equal(result, USgwplm.B)
+})
