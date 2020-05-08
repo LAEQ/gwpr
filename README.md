@@ -11,8 +11,6 @@ R (>= 4.0)
 
 ## Installation
 
-Open a R console or R Studio
-
 ```bash
 install.packages("devtools")
 library(devtools)
@@ -21,22 +19,6 @@ devtools.install_github("LAEQ/gwpr")
 ??gwpr
 ```
 
-```bash
+## Dataset
 
-setwd("C:\\Users\\David\\Documents\\inrs\\gwpr")
-install.packages("devtools")
-devtools::load_all()
-devtools::test()
-
-create()
-document()
-build()
-install.packages()
-library(<pkg-name>)
-
-```
-
-
-https://cran.r-project.org/doc/manuals/r-release/R-exts.html#The-INDEX-file
-https://usethis.r-lib.org
-https://www.datacamp.com/community/tutorials/r-packages-guide
+This package contains 2 datasets provided by ....
