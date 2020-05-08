@@ -9,7 +9,7 @@ test_that("Bandwith option: averages with adaptive bandwith ", {
   USStates@data$id <- c(1:length(unique(USStates@data[,"state"])))
   data <- merge(USStates@data, Produc, by="state", all=T)
 
-  dMat <- GWmodel::gw.dist(coordinates(USStates), p=2, longlat=F)
+  dMat <- GWmodel::gw.dist(sp::coordinates(USStates), p=2, longlat=F)
   Equation <- log(gsp) ~ log(pcap) + log(pc) + log(emp) + unemp
 
   bwAVG.A <- bw.avg(formula=Equation, data=data, SDF=USStates, index=c("id","year"), approach="AICc",

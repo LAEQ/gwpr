@@ -13,11 +13,16 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.0
 Depends: R (>= 4.0.0)
 Imports:
-    sp,
+    Rcpp,
+    foreign,
+    rgdal,
+    GWmodel,
     plm,
+    ggplot2,
+    stringr,
+    stargazer,
     plyr,
     dplyr,
-    GWmodel,
     lmtest
 Suggests: 
     testthat

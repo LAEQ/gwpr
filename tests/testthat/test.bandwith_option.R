@@ -16,6 +16,7 @@ test_that("Bandwith option: Version avec pseudo-CV / adaptive bw", {
   bwCV.A <-  bw.CV.A(formula=Equation, data=data, index=c("id","year"),
                      effect='individual', model="within", kernel="bisquare",
                      dMat=dMat, bws=c(30:40))
+
   expect_equal(bwCV.A[['Bandwidth']], 34)
 })
 
@@ -34,7 +35,5 @@ test_that("Bandwith option: Version avec pseudo-CV / fixed bw", {
                      effect='individual', model="within",
                      kernel="bisquare", dMat=dMat, interval=c(1500000, 2500000))
 
-  expect_true(TRUE)
-
-  # expect_equal(bwCV.F, 2038054.18356155, tolerance=1e-3)
+  expect_equal(bwCV.F, 2038054.18356155, tolerance=1e-3)
 })
