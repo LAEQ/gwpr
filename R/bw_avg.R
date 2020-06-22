@@ -31,18 +31,15 @@ library(plyr)
 #'
 #' @export
 bw.avg <- function(formula, data, SDF, index, approach=c("CV","AICc"), kernel="bisquare", adaptive=FALSE, p=2, longlat=FALSE, dMat){
-  #packages used in the function
-  require(plm)
-  require(GWmodel)
 
-  #Extraction of parameters to be used
-  pdata <- pdata.frame(data, index = index, drop.index = FALSE, row.names = FALSE,
-                       stringsAsFactors = default.stringsAsFactors())
-  panelModel <- plm(formula = formula, model="pooling", data=pdata, index=index)
+  #Data preparation
+  pdata <- plm::pdata.frame(data, index = index, drop.index = FALSE, row.names = FALSE,
+                            stringsAsFactors = default.stringsAsFactors())
+  panelModel <- plm::plm(formula = formula, model="pooling", data=pdata, index=index)
   n <- length(unique(pdata[,index[1]]))
   t <- length(unique(pdata[,index[2]]))
   K <- length(all.vars(formula)[-1])
-  y <- pmodel.response(panelModel) #allows for keeping variable transformations (log, ^x, ...)
+  y <- plm::pmodel.response(panelModel)
   x <- model.matrix(panelModel)[,-1]
 
   #Verification that the panel dataset is balanced
@@ -57,12 +54,13 @@ bw.avg <- function(formula, data, SDF, index, approach=c("CV","AICc"), kernel="b
   colnames(dataAVG) <- c(formula[[2]], colnames(x))
   SDF@data <- dataAVG
 
-  #Optimization process with transformed data (left without time dimension).
-  formulaAVG <- formula(dataAVG) #Creation of a new formula to avoid transforming variables a second time (ex. log(log(X)), ...)
-  bw <- bw.gwr(formula=formulaAVG, data=SDF, approach=approach, kernel=kernel,
-               adaptive=adaptive, p=p, longlat=longlat, dMat=dMat)
+  #Optimization process with transformed data
+  formulaAVG <- formula(dataAVG)
+  bw <- GWmodel::bw.gwr(formula=formulaAVG, data=SDF, approach=approach, kernel=kernel,
+                        adaptive=adaptive, p=p, longlat=longlat, dMat=dMat)
   return(bw)
 }
+
 
 #' A function for bandwith selection to calibrate a GWPR model, based on the mean over time of the data.
 
