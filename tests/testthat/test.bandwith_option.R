@@ -9,7 +9,7 @@ test_that("Bandwith option: Version avec pseudo-CV / adaptive bw", {
   USStates@data$id <- c(1:length(unique(USStates@data[,"state"])))
   data <- merge(USStates@data, Produc, by="state", all=T)
 
-  dMat <- GWmodel::gw.dist(coordinates(USStates), p=2, longlat=F)
+  dMat <- GWmodel::gw.dist(sp::coordinates(USStates), p=2, longlat=F)
   Equation <- log(gsp) ~ log(pcap) + log(pc) + log(emp) + unemp
 
   bwCV.A <-  bw.CV.A(formula=Equation, data=data, index=c("id","year"),
@@ -26,7 +26,7 @@ test_that("Bandwith option: Version avec pseudo-CV / fixed bw", {
   USStates@data$id <- c(1:length(unique(USStates@data[,"state"])))
   data <- merge(USStates@data, Produc, by="state", all=T)
 
-  dMat <- gw.dist(coordinates(USStates), p=2, longlat=F)
+  dMat <- GWmodel::gw.dist(sp::coordinates(USStates), p=2, longlat=F)
   Equation <- log(gsp) ~ log(pcap) + log(pc) + log(emp) + unemp
 
   ## fixed bw

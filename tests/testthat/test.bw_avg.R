@@ -1,4 +1,4 @@
-# Context("Bandwith options")
+# Context("Bandwidth options")
 
 library(testthat)
 
