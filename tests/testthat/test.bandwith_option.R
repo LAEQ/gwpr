@@ -12,12 +12,11 @@ test_that("Bandwith option: Version avec pseudo-CV / adaptive bw", {
   dMat <- GWmodel::gw.dist(coordinates(USStates), p=2, longlat=F)
   Equation <- log(gsp) ~ log(pcap) + log(pc) + log(emp) + unemp
 
-  ## adaptive bw
   bwCV.A <-  bw.CV.A(formula=Equation, data=data, index=c("id","year"),
                      effect='individual', model="within", kernel="bisquare",
                      dMat=dMat, bws=c(30:40))
 
-  expect_equal(bwCV.A[['Bandwidth']], 34)
+  expect_equal(bwCV.A, 34)
 })
 
 test_that("Bandwith option: Version avec pseudo-CV / fixed bw", {

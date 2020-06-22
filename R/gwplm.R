@@ -17,16 +17,11 @@
 #' @export
 gwplm <- function(SpDF, data, index, formula, bw, kernel, adaptive=F, dMat,
                   effect=c("individual", "time", "twoways", "nested"),
-                  #print.effects=c("individual", "time", "twoways"),
                   model = c("within", "random", "ht", "between", "pooling", "fd")){
 
   # Description:
   # This function implements basic geographically weighted panel regression (GWPR)
-  # The function requires the plm packages
-  require(plm)
-  require(GWmodel)
-  require(lmtest) # Je pense que ce package est utile seulement si l'on imprime
-  # les effets individuels/temporels (indisponible pour le moment)
+  # The function requires the plm and GWmodel packages
 
   # Arguments of the function
   #SpDF:         large SpatialPolygonsdataFrame
@@ -41,11 +36,11 @@ gwplm <- function(SpDF, data, index, formula, bw, kernel, adaptive=F, dMat,
   #model:        one of "pooling", "within", "between", "random", "fd", or "ht" (see plm::plm)
 
   #Panel data preparation
-  Pdata <- pdata.frame(data, index = index, drop.index = FALSE, row.names = FALSE,# On s'assure que le panel est bien ordonne sinon
-                       stringsAsFactors = default.stringsAsFactors())             # les poids wij ne seront pas bien distribues
-  PanelModel <- plm(formula = formula, effect=effect, model=model, data=Pdata, index=index)
-  y <- pmodel.response(PanelModel) # Permet d'extraire le y transforme (p.ex. avec model='within')
-  x <- model.matrix(PanelModel)    # Idem pour le X
+  Pdata <- plm::pdata.frame(data, index = index, drop.index = FALSE, row.names = FALSE,
+                            stringsAsFactors = default.stringsAsFactors())
+  PanelModel <- plm::plm(formula = formula, effect=effect, model=model, data=Pdata, index=index)
+  y <- plm::pmodel.response(PanelModel)
+  x <- model.matrix(PanelModel)
   n <- length(unique(Pdata[,index[1]]))
   t <- length(unique(Pdata[,index[2]]))
   K <- ncol(x)
@@ -56,21 +51,8 @@ gwplm <- function(SpDF, data, index, formula, bw, kernel, adaptive=F, dMat,
   cat("***********************************************************************\n")
 
   print(summary(PanelModel))
-  cat("R-square value: ",round(r.squared(PanelModel, type="rss"),5))
-  cat("\nAdjusted R-square value: ",round(r.squared(PanelModel, dfcor=TRUE),5))
-
-  # ----------------------------------------------------------------------------------------------------------
-  #!!!� modifier pour inclure tous les types d'effets selon les mod�les!!!
-  #ranef(plm (RE), effect = c("time","individual"))
-  #if(print.effects %in%  c("time","twoways")){
-  #  cat("\n\n**************************Time fixed effects***************************\n")
-  #  print(summary(fixef(PanelModel, effect="time",vcov=vcovHC(PanelModel,type="HC0",cluster="group"))))
-  #}
-  #if(print.effects %in%  c("individual","twoways")){
-  #  cat("\n\n***********************Individual fixed effects************************\n")
-  #  print(summary(fixef(PanelModel, effect="individual",vcov=vcovHC(PanelModel,type="HC0",cluster="group"))))
-  #}
-  # ----------------------------------------------------------------------------------------------------------
+  cat("R-square value: ", round(plm::r.squared(PanelModel, type="rss"), 5))
+  cat("\nAdjusted R-square value: ", round(plm::r.squared(PanelModel, dfcor=TRUE), 5))
 
   #Computation of the GWPR model
   ###############################
@@ -84,26 +66,24 @@ gwplm <- function(SpDF, data, index, formula, bw, kernel, adaptive=F, dMat,
   resid <- c()
 
   cat("\nComputing ", n, " local weighted panel regressions\n", sep="")
-  pb <- txtProgressBar(min = 0, max = n, style = 3)
+  pb <- utils::txtProgressBar(min = 0, max = n, style = 3)
   for (i in 1:n){
-    # Tous ces calculs sont decrits dans ArticleGWPR.doc et referes
-    W.i <- gw.weight(as.numeric(dMat[i,]),bw=bw,kernel=kernel,adaptive=adaptive) # Calcul des poids
+    W.i <- GWmodel::gw.weight(as.numeric(dMat[i,]),bw=bw,kernel=kernel,adaptive=adaptive)
     W.i <- diag(W.i)
-    W.i <- kronecker(W.i,diag(t)) # On cree la matrice W en dimensions nT
+    W.i <- kronecker(W.i,diag(t))
     wMat[i,] <- diag(W.i)
     C.i <- (solve(t(x)%*%W.i%*%x))%*%t(x)%*%W.i
     listC[[i]] <- C.i
-    Pdata$wgt <- wMat[i,]
-    plm.i <- plm(formula = formula, effect=effect, model=model, data=Pdata, index=index, weights = wgt)
-    coefsMat[i,] <- plm.i$coefficients
+    Pdata[['wgt']] <- wMat[i,]
+    plm.i <- plm::plm(formula = formula, effect=effect, model=model, data=Pdata, index=index, weights = wgt)
+    coefsMat[i,] <- plm.i[['coefficients']]
 
     for(j in 1:t){
       hatMat[(i-1)*t+j,] <- x[(i-1)*t+j,]%*%C.i
       yHat[(i-1)*t+j] <- predict(plm.i)[(i-1)*t+j]
-      resid[(i-1)*t+j] <- plm.i$residuals[(i-1)*t+j]
+      resid[(i-1)*t+j] <- plm.i[['residuals']][(i-1)*t+j]
     }
-
-    setTxtProgressBar(pb, i)
+    utils::setTxtProgressBar(pb, i)
   }
   close(pb)
 
@@ -121,7 +101,7 @@ gwplm <- function(SpDF, data, index, formula, bw, kernel, adaptive=F, dMat,
   RSS <- t(resid)%*%(resid)
   v1 <- sum(diag(hatMat))
   v2 <- sum(hatMat^2)
-  edf <- n*t -2*v1 + v2 # "effective degrees of freedom" : version adaptee aux donnees panels.
+  edf <- n*t -2*v1 + v2 # effective degrees of freedom
   R2 <- (TSS - RSS)/TSS
   adj.R2 <- 1 - (1 - R2)*(n*t - 1)/(edf - 1)
 
@@ -155,16 +135,16 @@ gwplm <- function(SpDF, data, index, formula, bw, kernel, adaptive=F, dMat,
   assign("Spatial panel data frame", SpDF, envir=env)
 
   #Creating the shapefile with the GWPR results(coefficients, standard errors and T values)
-  listMat <- list(coefsMat,SEsMat,TVsMat)
+  listMat <- list(coefsMat, SEsMat, TVsMat)
   for(i in 1:length(listMat)){
     newVars <- colnames(listMat[[i]])
     for(j in 1:length(newVars)){
-      SpDF$x <- listMat[[i]][,j]
+      SpDF[['x']] <- listMat[[i]][,j]
       last <- length(names(SpDF))
       names(SpDF)[last] <- newVars[j]
     }
   }
-  SpDF$localR2 <- localR2
+  SpDF[['localR2']] <- localR2
 
   cat("\n***********************************************************************\n")
   cat("*         Results of Geographically Weighted Panel Regression         *\n")
@@ -186,10 +166,10 @@ gwplm <- function(SpDF, data, index, formula, bw, kernel, adaptive=F, dMat,
   cat("Number of observations (n):", n,"\n")
   cat("Number of time periods (t):", t,"\n")
   cat("Number of data points (n*t):", n*t,"\n")
-  cat("Effective degrees of freedom (n*t-2trace(S) + trace(S'S)):", round(edf,3),"\n")
-  cat("Residual sum of squares:", round(RSS,3),"\n")
-  cat("R-squared value:", round(R2,5),"\n")
-  cat("Adjusted R-squared value:", round(adj.R2,5),"\n")
+  cat("Effective degrees of freedom (n*t-2trace(S) + trace(S'S)):", round(edf, 3),"\n")
+  cat("Residual sum of squares:", round(RSS, 5),"\n")
+  cat("R-squared value:", round(R2, 5),"\n")
+  cat("Adjusted R-squared value:", round(adj.R2, 5),"\n")
 
   res <- list(listMat, SpDF, R2, adj.R2)
   return(res)
