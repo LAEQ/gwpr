@@ -2,7 +2,7 @@
 % Please edit documentation in R/bw_avg.R
 \name{bw.avg}
 \alias{bw.avg}
-\title{A function for bandwith selection to calibrate a GWPR model, based on the mean over time of the data.
+\title{A function for bandwidth selection to calibrate a GWPR model, based on the mean over time of the data.
 The formula for calculating the CV value for Panel is based on the study of:
 YU, Danlin. 2010. Exploring spatiotemporally varying regressed relationships: the geographically weighted panel regression analysis.
 In : Proceedings of the Joint International Conference on Theory, data Handling and modelling in GeoSpatial Information Science. p. 134-}
@@ -45,7 +45,7 @@ bw.avg(
 double
 }
 \description{
-A function for bandwith selection to calibrate a GWPR model, based on the mean over time of the data.
+A function for bandwidth selection to calibrate a GWPR model, based on the mean over time of the data.
 The formula for calculating the CV value for Panel is based on the study of:
 YU, Danlin. 2010. Exploring spatiotemporally varying regressed relationships: the geographically weighted panel regression analysis.
 In : Proceedings of the Joint International Conference on Theory, data Handling and modelling in GeoSpatial Information Science. p. 134-

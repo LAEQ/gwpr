@@ -5,11 +5,11 @@
 \alias{Produc}
 \title{Produc}
 \format{
-A list of <to complete>
+A list of 816 observations of 11 variables between 1970 and 1986 for 48 states
 \itemize{
-\item state
-\item year
-\item region
+\item state {US State}
+\item year {year}
+\item region {region id}
 \item pcap
 \item pcap
 \item hwy

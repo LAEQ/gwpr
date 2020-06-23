@@ -2,7 +2,7 @@
 % Please edit documentation in R/bw_avg.R
 \name{bw.CV.A}
 \alias{bw.CV.A}
-\title{A function for bandwith selection to calibrate a GWPR model, based on the mean over time of the data.
+\title{A function for bandwidth selection to calibrate a GWPR model, based on the mean over time of the data.
 Arguments of the function}
 \usage{
 bw.CV.A(
@@ -37,6 +37,6 @@ bw.CV.A(
 list(bandwidth = double)
 }
 \description{
-A function for bandwith selection to calibrate a GWPR model, based on the mean over time of the data.
+A function for bandwidth selection to calibrate a GWPR model, based on the mean over time of the data.
 Arguments of the function
 }

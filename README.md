@@ -13,20 +13,18 @@ R (>= 4.0)
 
 ```bash
 devtools.install_github("LAEQ/gwpr")
-
-??gwpr
 ```
 
 ## Examples
 
-Some examples of the main features
+Some examples how to 
 
 
 ```bash
 library(gwpr)
 data(USStates)
 
-# L'ordre des Etats dans le dataset ("Produc") n'est pas le m?me que celui du shapefile.
+# L'ordre des Etats dans le dataset ("Produc") n'est pas le meme que celui du shapefile.
 # On commence donc par reordonner et fusionner les fichiers pour que les weights soient
 # attribues aux bons Etats danms les prochaines etapes.
 USStates@data$id <- c(1:length(unique(USStates@data[,"state"])))

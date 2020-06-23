@@ -5,7 +5,7 @@
 \alias{USStates}
 \title{USStates}
 \format{
-A spatialPolygonDataFrame
+A spatialPolygonDataFrame with 48 rows and 4 variables:
 }
 \usage{
 USStates
