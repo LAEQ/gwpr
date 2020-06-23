@@ -15,6 +15,15 @@
 #' @return
 #'
 #' @export
+#'
+#' @examples
+#' data(USStates)
+#' USStates@data$id <- c(1:length(unique(USStates@data[,"state"])))
+#' data <- merge(USStates@data, Produc, by="state", all=True)
+#' dMat <- GWmodel::gw.dist(sp::coordinates(USStates), p=2, longlat=F)
+#' Equation <- log(gsp) ~ log(pcap) + log(pc) + log(emp) + unemp
+#' bwCV.A <- bw.CV.A(formula=Equation, data=data, index=c("id","year"), effect='individual', model="within", kernel="bisquare", dMat=dMat, bws=c(30:40))
+#' result <- gwplm(SpDF=USStates, data=data, index=c("id", "year"),formula=Equation, bw = bwCV.A, kernel="bisquare", adaptive=T, effect="individual", model="within", dMat=dMat)
 gwplm <- function(SpDF, data, index, formula, bw, kernel, adaptive=F, dMat,
                   effect=c("individual", "time", "twoways", "nested"),
                   model = c("within", "random", "ht", "between", "pooling", "fd")){

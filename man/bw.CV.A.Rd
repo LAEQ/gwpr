@@ -40,11 +40,3 @@ double
 A function for bandwidth selection to calibrate a GWPR model, based on the mean over time of the data.
 Arguments of the function
 }
-\examples{
-data(USStates)
-USStates@data$id <- c(1:length(unique(USStates@data[,"state"])))
-data <- merge(USStates@data, Produc, by="state", all=T)
-dMat <- GWmodel::gw.dist(sp::coordinates(USStates), p=2, longlat=F)
-Equation <- log(gsp) ~ log(pcap) + log(pc) + log(emp) + unemp
-bwCV.A <-  bw.CV.A(formula=Equation, data=data, index=c("id","year"), effect='individual', model="within", kernel="bisquare", dMat=dMat, bws=c(30:40))
-}
