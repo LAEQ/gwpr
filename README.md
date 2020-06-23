@@ -28,7 +28,7 @@ data(USStates)
 USStates@data$id <- c(1:length(unique(USStates@data[,"state"])))
 data <- merge(USStates@data, Produc, by="state", all=T)
 
-dMat <- gw.dist(coordinates(USStates), p=2, longlat=F)
+dMat <- GWmodel::gw.dist(coordinates(USStates), p=2, longlat=F)
 Equation <- log(gsp) ~ log(pcap) + log(pc) + log(emp) + unemp
 
 
@@ -36,19 +36,15 @@ Equation <- log(gsp) ~ log(pcap) + log(pc) + log(emp) + unemp
 
 # Version avec donnees moyennes (sur le temps)
 # adaptive bw
-bwAVG.A <- bw.avg(formula=Equation, data=data, SDF=USStates, index=c("id","year"), approach="AICc", 
-                  kernel="bisquare", adaptive=T, p=2, longlat=F, dMat=dMat)
+bwAVG.A <- bw.avg(formula=Equation, data=data, SDF=USStates, index=c("id","year"), approach="AICc", kernel="bisquare", adaptive=TRUE, p=2, longlat=FALSE, dMat=dMat)
 # fixed bw
-bwAVG.F <- bw.avg(formula=Equation, data=data, SDF=USStates, index=c("id","year"), approach="AICc", 
-                  kernel="bisquare", adaptive=F, p=2, longlat=F, dMat=dMat)
+bwAVG.F <- bw.avg(formula=Equation, data=data, SDF=USStates, index=c("id","year"), approach="AICc", kernel="bisquare", adaptive=FALSE, p=2, longlat=F, dMat=dMat)
 
 # Version avec pseudo-CV
 # adaptive bw
-bwCV.A <-  bw.CV.A(formula=Equation, data=data, index=c("id","year"), effect='individual', model="within", 
-                   kernel="bisquare", dMat=dMat, bws=c(30:40))
+bwCV.A <-  bw.CV.A(formula=Equation, data=data, index=c("id","year"), effect='individual', model="within", kernel="bisquare", dMat=dMat, bws=c(30:40))
 # fixed bw
-bwCV.F <-  bw.CV.F(formula=Equation, data=data, index=c("id","year"), effect='individual', model="within", 
-                   kernel="bisquare", dMat=dMat, interval=c(1500000, 2500000))
+bwCV.F <-  bw.CV.F(formula=Equation, data=data, index=c("id","year"), effect='individual', model="within", kernel="bisquare", dMat=dMat, interval=c(1500000, 2500000))
 
 # GWPR model
 
@@ -57,11 +53,9 @@ bwCV.F <-  bw.CV.F(formula=Equation, data=data, index=c("id","year"), effect='in
 
 # individual FE
 # adaptive bw
-USgwplm.A <- gwplm(SpDF=USStates, data=data, index=c("id", "year"), formula=Equation, bw=bwCV.A, kernel="bisquare", 
-                   adaptive=T, effect="individual", model="within", dMat=dMat)
+USgwplm.A <- gwplm(SpDF=USStates, data=data, index=c("id", "year"), formula=Equation, bw=bwCV.A, kernel="bisquare", adaptive=TRUE, effect="individual", model="within", dMat=dMat)
 # fixed bw
-USgwplm.F <- gwplm(SpDF=USStates, data=data, index=c("id", "year"), formula=Equation, bw=bwCV.F, kernel="bisquare", 
-                   adaptive=F, effect="individual", model="within", dMat=dMat)
+USgwplm.F <- gwplm(SpDF=USStates, data=data, index=c("id", "year"), formula=Equation, bw=bwCV.F, kernel="bisquare", adaptive=FALSE, effect="individual", model="within", dMat=dMat)
 
 ```
 

@@ -21,10 +21,10 @@
 #' data(USStates)
 #' USStates@data$id <- c(1:length(unique(USStates@data[,"state"])))
 #' data <- merge(USStates@data, Produc, by="state", all=True)
-#' dMat <- GWmodel::gw.dist(sp::coordinates(USStates), p=2, longlat=F)
+#' dMat <- GWmodel::gw.dist(sp::coordinates(USStates), p=2, longlat=FALSE)
 #' Equation <- log(gsp) ~ log(pcap) + log(pc) + log(emp) + unemp
-#' bwAVG.A <- bw.avg(formula=Equation, data=data, SDF=USStates, index=c("id","year"), approach="AICc", kernel="bisquare", adaptive=T, p=2, longlat=F, dMat=dMat)
-bw.avg <- function(formula, data, SDF, index, approach=c("CV","AICc"), kernel="bisquare", adaptive=FALSE, p=2, longlat=FALSE, dMat){
+#' bwAVG.A <- bw.avg(formula=Equation, data=data, SDF=USStates, index=c("id","year"), approach="AICc", kernel="bisquare", adaptive=T, p=2, longlat=FALSE, dMat=dMat)
+bw.avg <- function(formula, data, SDF, index, approach=c("CV","AICc"), kernel="bisquare", adaptive=FALSE, p=2, longlat=FALSEALSE, dMat){
 
   #Data preparation
   pdata <- plm::pdata.frame(data, index = index, drop.index = FALSE, row.names = FALSE,
@@ -75,7 +75,7 @@ bw.avg <- function(formula, data, SDF, index, approach=c("CV","AICc"), kernel="b
 #' data(USStates)
 #' USStates@data$id <- c(1:length(unique(USStates@data[,"state"])))
 #' data <- merge(USStates@data, Produc, by="state", all=True)
-#' dMat <- GWmodel::gw.dist(sp::coordinates(USStates), p=2, longlat=F)
+#' dMat <- GWmodel::gw.dist(sp::coordinates(USStates), p=2, longlat=FALSE)
 #' Equation <- log(gsp) ~ log(pcap) + log(pc) + log(emp) + unemp
 #' bwCV.A <-  bw.CV.A(formula=Equation, data=data, index=c("id","year"), effect='individual', model="within", kernel="bisquare", dMat=dMat, bws=c(30:40))
 bw.CV.A <- function(formula, data, index, effect=c("individual", "time", "twoways", "nested"),
@@ -135,7 +135,7 @@ bw.CV.A <- function(formula, data, index, effect=c("individual", "time", "twoway
 #' @examples
 #' USStates@data$id <- c(1:length(unique(USStates@data[,"state"])))
 #' data <- merge(USStates@data, Produc, by="state", all=True)
-#' dMat <- GWmodel::gw.dist(sp::coordinates(USStates), p=2, longlat=F)
+#' dMat <- GWmodel::gw.dist(sp::coordinates(USStates), p=2, longlat=FALSE)
 #' Equation <- log(gsp) ~ log(pcap) + log(pc) + log(emp) + unemp
 #' bwCV.F <-  bw.CV.F(formula=Equation, data=data, index=c("id","year"), effect='individual', model="within", kernel="bisquare", dMat=dMat, interval=c(1500000, 2500000))
 bw.CV.F <- function(formula, data, index, effect=c("individual", "time", "twoways", "nested"),
