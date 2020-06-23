@@ -47,5 +47,4 @@ data <- merge(USStates@data, Produc, by="state", all=T)
 dMat <- GWmodel::gw.dist(sp::coordinates(USStates), p=2, longlat=F)
 Equation <- log(gsp) ~ log(pcap) + log(pc) + log(emp) + unemp
 bwCV.A <-  bw.CV.A(formula=Equation, data=data, index=c("id","year"), effect='individual', model="within", kernel="bisquare", dMat=dMat, bws=c(30:40))
-
 }

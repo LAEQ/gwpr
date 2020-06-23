@@ -15,6 +15,7 @@
 #' @return
 #'
 #' @export
+#'
 #' @examples
 #' data(USStates)
 #' USStates@data$id <- c(1:length(unique(USStates@data[,"state"])))

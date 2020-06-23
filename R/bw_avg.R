@@ -70,6 +70,7 @@ bw.avg <- function(formula, data, SDF, index, approach=c("CV","AICc"), kernel="b
 #' @return double
 #'
 #' @export
+#'
 #' @examples
 #' data(USStates)
 #' USStates@data$id <- c(1:length(unique(USStates@data[,"state"])))
@@ -77,7 +78,6 @@ bw.avg <- function(formula, data, SDF, index, approach=c("CV","AICc"), kernel="b
 #' dMat <- GWmodel::gw.dist(sp::coordinates(USStates), p=2, longlat=F)
 #' Equation <- log(gsp) ~ log(pcap) + log(pc) + log(emp) + unemp
 #' bwCV.A <-  bw.CV.A(formula=Equation, data=data, index=c("id","year"), effect='individual', model="within", kernel="bisquare", dMat=dMat, bws=c(30:40))
-#'
 bw.CV.A <- function(formula, data, index, effect=c("individual", "time", "twoways", "nested"),
                     model=c("within", "random", "ht", "between", "pooling", "fd"),
                     kernel="bisquare", dMat, bws){
