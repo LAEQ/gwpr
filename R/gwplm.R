@@ -45,15 +45,6 @@ gwplm <- function(SpDF, data, index, formula, bw, kernel, adaptive=F, dMat,
   t <- length(unique(Pdata[,index[2]]))
   K <- ncol(x)
 
-  #Global panel model
-  cat("***********************************************************************\n")
-  cat("*                  Results of Global Panel Regression                 *\n")
-  cat("***********************************************************************\n")
-
-  print(summary(PanelModel))
-  cat("R-square value: ", round(plm::r.squared(PanelModel, type="rss"), 5))
-  cat("\nAdjusted R-square value: ", round(plm::r.squared(PanelModel, dfcor=TRUE), 5))
-
   #Computation of the GWPR model
   ###############################
 
@@ -65,8 +56,6 @@ gwplm <- function(SpDF, data, index, formula, bw, kernel, adaptive=F, dMat,
   yHat <- c()
   resid <- c()
 
-  cat("\nComputing ", n, " local weighted panel regressions\n", sep="")
-  pb <- utils::txtProgressBar(min = 0, max = n, style = 3)
   for (i in 1:n){
     W.i <- GWmodel::gw.weight(as.numeric(dMat[i,]),bw=bw,kernel=kernel,adaptive=adaptive)
     W.i <- diag(W.i)
@@ -83,9 +72,7 @@ gwplm <- function(SpDF, data, index, formula, bw, kernel, adaptive=F, dMat,
       yHat[(i-1)*t+j] <- predict(plm.i)[(i-1)*t+j]
       resid[(i-1)*t+j] <- plm.i[['residuals']][(i-1)*t+j]
     }
-    utils::setTxtProgressBar(pb, i)
   }
-  close(pb)
 
   #Local R-Squared
   localR2 <- numeric()
@@ -145,31 +132,6 @@ gwplm <- function(SpDF, data, index, formula, bw, kernel, adaptive=F, dMat,
     }
   }
   SpDF[['localR2']] <- localR2
-
-  cat("\n***********************************************************************\n")
-  cat("*         Results of Geographically Weighted Panel Regression         *\n")
-  cat("***********************************************************************\n")
-  cat("*********************Model Calibration information*********************\n")
-  cat("Kernel Function:", kernel, "\n")
-  if(adaptive==TRUE) cat("Adaptive bandwidth:", bw, "(number of nearest neighbours)\n") else cat("Fixed bandwidth:", round(bw,3), "(distance)\n")
-  cat("Panel model used:", model, "\n")
-  cat("Type of effects:", effect, "\n")
-
-  cat("\n***************Summary of GWPR coefficient estimates:*****************\n")
-  print(summary(coefsMat))
-  cat("\n*********************Summary of GWPR T values:************************\n")
-  print(summary(TVsMat))
-  cat("\n**************Summary of GWPR local R squared values:*****************\n")
-  print(summary(localR2))
-
-  cat("\n************************Diagnostic information************************\n")
-  cat("Number of observations (n):", n,"\n")
-  cat("Number of time periods (t):", t,"\n")
-  cat("Number of data points (n*t):", n*t,"\n")
-  cat("Effective degrees of freedom (n*t-2trace(S) + trace(S'S)):", round(edf, 3),"\n")
-  cat("Residual sum of squares:", round(RSS, 5),"\n")
-  cat("R-squared value:", round(R2, 5),"\n")
-  cat("Adjusted R-squared value:", round(adj.R2, 5),"\n")
 
   res <- list(listMat, SpDF, R2, adj.R2)
   return(res)

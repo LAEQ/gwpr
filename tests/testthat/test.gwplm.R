@@ -21,9 +21,9 @@ test_that("Bandwith option:Version avec donnees moyennes / adaptive bw ", {
                      dMat=dMat)
 
 
-  USgwplm.A <- readRDS(system.file("USgwplm.A.rds", package = "gwpr"))
+  USgwplm_A <- readRDS(system.file("USgwplm.A.rds", package = "gwpr"))
 
-  expect_equal(result,  USgwplm.A)
+  expect_equal(result,  USgwplm_A)
 })
 
 
@@ -45,7 +45,7 @@ test_that("Bandwith option:Version avec donnees moyennes / adaptive bw ", {
                      dMat=dMat)
 
 
-  USgwplm.B <- readRDS(system.file("USgwplm.B.rds", package = "gwpr"))
+  USgwplm_B <- readRDS(system.file("USgwplm.B.rds", package = "gwpr"))
 
-  expect_equal(result, USgwplm.B)
+  expect_equal(result, USgwplm_B)
 })

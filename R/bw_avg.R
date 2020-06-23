@@ -3,7 +3,7 @@
 #' YU, Danlin. 2010. Exploring spatiotemporally varying regressed relationships: the geographically weighted panel regression analysis.
 #' In : Proceedings of the Joint International Conference on Theory, data Handling and modelling in GeoSpatial Information Science. p. 134-
 #'
-#' @param formula Regression model formula : Y ~ X1 + ... + Xk
+#' @param formula      Regression model formula : Y ~ X1 + ... + Xk
 #' @param data         dataFrame for the Panel data
 #' @param SDF          large SpatialPolygonsdataFrame on which is based the data
 #' @param index        List for the indexes : (c(" ID, Time"))
@@ -48,7 +48,7 @@ bw.avg <- function(formula, data, SDF, index, approach=c("CV","AICc"), kernel="b
   return(bw)
 }
 
-#' A function for bandwith selection to calibrate a GWPR model, based on the mean over time of the data.
+#' A function for bandwidth selection to calibrate a GWPR model, based on the mean over time of the data.
 
 #' Arguments of the function
 #' @param formula Regression model formula : Y ~ X1 + ... + Xk
@@ -76,9 +76,6 @@ bw.CV.A <- function(formula, data, index, effect=c("individual", "time", "twoway
   colnames(CVsMat) <- c("Bandwidth", "CV-score")
   resid <- c()
 
-  #Optimization Process
-  cat("\nOptimization Process:", length(bws), "iterations \n")
-  pb <- utils::txtProgressBar(min = 0, max = length(bws), style = 3)
   for(i in 1:length(bws)){
     bw <- bws[i]
 
@@ -99,14 +96,9 @@ bw.CV.A <- function(formula, data, index, effect=c("individual", "time", "twoway
     CVsMat[i,2] <- t(resid)%*%(resid)
     Pdata[['wgt']] <- NULL
     resid <- NULL
-    utils::setTxtProgressBar(pb, i)
   }
-  close(pb)
 
   bw <- subset(CVsMat, CVsMat[,2]==min(CVsMat[,2], na.rm=TRUE))
-  print(as.data.frame(CVsMat))
-  cat("Optimal value for the bandwidth (number of neighbors): ", bw[,'Bandwidth'], sep="")
-  cat("\nwith a CV score value: ", bw[,'CV-score'], sep="")
 
   return(as.numeric(bw[,'Bandwidth']))
 }
@@ -138,7 +130,6 @@ bw.CV.F <- function(formula, data, index, effect=c("individual", "time", "twoway
 
   #Optimization Process
   CV <- function(bw, n, kernel, adaptive){
-
     for(j in 1:n){
       W.j <- GWmodel::gw.weight(as.numeric(dMat[j,]), bw=bw, kernel=kernel, adaptive=adaptive)
       W.j[j] <- 0
@@ -159,8 +150,6 @@ bw.CV.F <- function(formula, data, index, effect=c("individual", "time", "twoway
   bw.cv <- optimize(CV, interval=interval, n=n, kernel=kernel, adaptive=F, maximum=F)
   bw <- as.numeric(bw.cv)
   names(bw) <- c('Bandwidth', 'CV-score')
-  cat("Optimal value for the bandwidth (distance): ", bw[['Bandwidth']], sep="")
-  cat("\nwith a CV score value: ", bw[['CV-score']], sep="")
 
   return(bw[['Bandwidth']])
 }
