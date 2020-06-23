@@ -12,7 +12,7 @@ R (>= 4.0)
 ## Installation
 
 ```bash
-devtools.install_github("LAEQ/gwpr")
+devtools::install_github("LAEQ/gwpr")
 ```
 
 ## Examples
