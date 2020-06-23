@@ -70,7 +70,7 @@ bw.avg <- function(formula, data, SDF, index, approach=c("CV","AICc"), kernel="b
 #' @return double
 #'
 #' @export
-#' @example
+#' @examples
 #' data(USStates)
 #' USStates@data$id <- c(1:length(unique(USStates@data[,"state"])))
 #' data <- merge(USStates@data, Produc, by="state", all=T)
@@ -132,7 +132,7 @@ bw.CV.A <- function(formula, data, index, effect=c("individual", "time", "twoway
 #' @return double
 #'
 #' @export
-#' @example
+#' @examples
 #' USStates@data$id <- c(1:length(unique(USStates@data[,"state"])))
 #' data <- merge(USStates@data, Produc, by="state", all=T)
 #' dMat <- GWmodel::gw.dist(sp::coordinates(USStates), p=2, longlat=F)

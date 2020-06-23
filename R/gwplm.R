@@ -15,7 +15,7 @@
 #' @return
 #'
 #' @export
-#' @example
+#' @examples
 #' data(USStates)
 #' USStates@data$id <- c(1:length(unique(USStates@data[,"state"])))
 #' data <- merge(USStates@data, Produc, by="state", all=T)
