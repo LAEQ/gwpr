@@ -1,14 +1,14 @@
 #' A function for bandwidth selection to calibrate a GWPR model, based on the mean over time of the data.
 #' The formula for calculating the CV value for Panel is based on the study of:
 #' YU, Danlin. 2010. Exploring spatiotemporally varying regressed relationships: the geographically weighted panel regression analysis.
-#' In : Proceedings of the Joint International Conference on Theory, data Handling and modelling in GeoSpatial Information Science. p. 134-
+#' In : Proceedings of the Joint International Conference on Theory, data Handling and modeling in GeoSpatial Information Science. p. 134-
 #'
 #' @param formula      Regression model formula : Y ~ X1 + ... + Xk
 #' @param data         dataFrame for the Panel data
 #' @param SDF          large SpatialPolygonsdataFrame on which is based the data
 #' @param index        List for the indexes : (c(" ID, Time"))
 #' @param approach     score used to optimize the bandwidth (see GWmodel::bw.gwr)
-#' @param kernel       gaussian,exponential, bisquare, tricube, boxcar (see GWmodel::gw.weight)
+#' @param kernel       gaussian, exponential, bisquare, tricube, boxcar (see GWmodel::gw.weight)
 #' @param adaptive     TRUE or FALSE (see GWmodel::gw.weight)
 #' @param p	           the power of the Minkowski distance, default is 2, i.e. the Euclidean distance (see GWmodel::bw.gwr)
 #' @param longlat      if TRUE, great circle distances will be calculated (see GWmodel::bw.gwr)
@@ -17,6 +17,13 @@
 #' @return double
 #'
 #' @export
+#' @examples
+#' data(USStates)
+#' USStates@data$id <- c(1:length(unique(USStates@data[,"state"])))
+#' data <- merge(USStates@data, Produc, by="state", all=T)
+#' dMat <- GWmodel::gw.dist(sp::coordinates(USStates), p=2, longlat=F)
+#' Equation <- log(gsp) ~ log(pcap) + log(pc) + log(emp) + unemp
+#' bwAVG.A <- bw.avg(formula=Equation, data=data, SDF=USStates, index=c("id","year"), approach="AICc", kernel="bisquare", adaptive=T, p=2, longlat=F, dMat=dMat)
 bw.avg <- function(formula, data, SDF, index, approach=c("CV","AICc"), kernel="bisquare", adaptive=FALSE, p=2, longlat=FALSE, dMat){
 
   #Data preparation
@@ -60,9 +67,17 @@ bw.avg <- function(formula, data, SDF, index, approach=c("CV","AICc"), kernel="b
 #' @param dMat a distance matrix or vector (Optional parameter, see GWmodel::gw.weight)
 #' @param bws bandwidths to be used for calculations of CV-score
 #'
-#' @return list(bandwidth = double)
+#' @return double
 #'
 #' @export
+#' @example
+#' data(USStates)
+#' USStates@data$id <- c(1:length(unique(USStates@data[,"state"])))
+#' data <- merge(USStates@data, Produc, by="state", all=T)
+#' dMat <- GWmodel::gw.dist(sp::coordinates(USStates), p=2, longlat=F)
+#' Equation <- log(gsp) ~ log(pcap) + log(pc) + log(emp) + unemp
+#' bwCV.A <-  bw.CV.A(formula=Equation, data=data, index=c("id","year"), effect='individual', model="within", kernel="bisquare", dMat=dMat, bws=c(30:40))
+#'
 bw.CV.A <- function(formula, data, index, effect=c("individual", "time", "twoways", "nested"),
                     model=c("within", "random", "ht", "between", "pooling", "fd"),
                     kernel="bisquare", dMat, bws){
@@ -117,6 +132,12 @@ bw.CV.A <- function(formula, data, index, effect=c("individual", "time", "twoway
 #' @return double
 #'
 #' @export
+#' @example
+#' USStates@data$id <- c(1:length(unique(USStates@data[,"state"])))
+#' data <- merge(USStates@data, Produc, by="state", all=T)
+#' dMat <- GWmodel::gw.dist(sp::coordinates(USStates), p=2, longlat=F)
+#' Equation <- log(gsp) ~ log(pcap) + log(pc) + log(emp) + unemp
+#' bwCV.F <-  bw.CV.F(formula=Equation, data=data, index=c("id","year"), effect='individual', model="within", kernel="bisquare", dMat=dMat, interval=c(1500000, 2500000))
 bw.CV.F <- function(formula, data, index, effect=c("individual", "time", "twoways", "nested"),
                     model=c("within", "random", "ht", "between", "pooling", "fd"),
                     kernel="bisquare", dMat, interval){

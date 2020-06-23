@@ -38,3 +38,10 @@ double
 \description{
 A function for bandwith selection to calibrate a GWPR model, based on the mean over time of the data.
 }
+\examples{
+USStates@data$id <- c(1:length(unique(USStates@data[,"state"])))
+data <- merge(USStates@data, Produc, by="state", all=T)
+dMat <- GWmodel::gw.dist(sp::coordinates(USStates), p=2, longlat=F)
+Equation <- log(gsp) ~ log(pcap) + log(pc) + log(emp) + unemp
+bwCV.F <-  bw.CV.F(formula=Equation, data=data, index=c("id","year"), effect='individual', model="within", kernel="bisquare", dMat=dMat, interval=c(1500000, 2500000))
+}
